@@ -1,0 +1,52 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestRegressor
+
+# Load refined dataset
+df = pd.read_csv("cars_refined.csv")
+
+# -----------------------------
+# Feature Engineering
+# -----------------------------
+df["Car_Age"] = 2025 - df["Year"]
+
+# Encode categorical variables
+cat_cols = ["Brand", "Model", "Fuel_Type", "Transmission", "Owner_Type"]
+le = LabelEncoder()
+for col in cat_cols:
+    df[col] = le.fit_transform(df[col])
+
+if "Car_ID" in df.columns:
+    df.drop("Car_ID", axis=1, inplace=True)
+
+# -----------------------------
+# Train-Test Split
+# -----------------------------
+X = df.drop("Price", axis=1)
+y = df["Price"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# -----------------------------
+# Model Training (Random Forest)
+# -----------------------------
+model = RandomForestRegressor(n_estimators=200, random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+# -----------------------------
+# Scatter Plot
+# -----------------------------
+plt.figure(figsize=(8,6))
+sns.scatterplot(x=y_test, y=y_pred, alpha=0.7)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')  # perfect prediction line
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual vs Predicted Car Prices")
+plt.show()
