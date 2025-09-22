@@ -1,0 +1,14 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# Load dataset
+df = pd.read_csv("cars.csv")
+
+# Split into train and test sets (80-20 split)
+train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
+
+# Save to CSV files
+train_df.to_csv("train.csv", index=False)
+test_df.to_csv("test.csv", index=False)
+
+print("Train and test CSV files created successfully!")
